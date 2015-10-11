@@ -1,110 +1,31 @@
 require 'curses'
-engine1 = [
-%s(),
-%s(                    (  ) (@@)  ( )  (@)  ()     @@     O     @     o     @     o),
-%s(                 (@@@)),
-%s(              (    )),
-%s(           (@@@@)),
-%s(),
-%s(        (    )),
-%s(       =====        ________                ___________),
-%s(   _D _|   |_______/        \__I_I_____===__|_________|),
-%s(    | (_)---   |  H\________/ |   |        =|_______|       __________________),
-%s(   /        |  |  H  |  |     |   |         ||_| [_]|      _|                 \______A),
-%s(  |         |  |  H  |__--------------------| [___] |    =|                          |),
-%s(  | ___________|__H__/__|_____/[][]~\_______|       |    -|                          |),
-%s(  |/ |   |-------------I_____I [][] []  D   |=======|_____|__________________________|_),
-%s(__/ =| o |=-~o=====o=====o=====o\ ______Y___________|__|_____________________________|_),
-%s( |/-=|___|=   ||   ||   ||   |___________/~\___/            |_D__D__D_|  |_D__D__D_|),
-%s(  \_/      \_/  \_/  \_/  \_/            \_/                 \_/   \_/    \_/   \_/)
-]
-engine2 = [
-%s(),
-%s(                    (  ) (@@)  ( )  (@)  ()     @@     O     @     o     @     o),
-%s(                 (@@@)),
-%s(              (    )),
-%s(           (@@@@)),
-%s(),
-%s(        (    )),
-%s(       =====        ________                ___________),
-%s(   _D _|   |_______/        \__I_I_____===__|_________|),
-%s(    | (_)---   |  H\________/ |   |        =|_______|       __________________),
-%s(   /        |  |  H  |  |     |   |         ||_| [_]|      _|                 \______A),
-%s(  |         |  |  H  |__--------------------| [___] |    =|                          |),
-%s(  | ___________|__H__/__|_____/[][]~\_______|       |    -|                          |),
-%s(  |/ |   |-------------I_____I [][] []  D   |=======|_____|__________________________|_),
-%s(__/ =| o | / \  / \  / \  / \___________Y___________|__|_____________________________|_),
-%s( |/-=|___|=-~o=====o=====o=====o\________/~\___/            |_D__D__D_|  |_D__D__D_|),
-%s(  \_/      \_/  \_/  \_/  \_/            \_/                 \_/   \_/    \_/   \_/)
-]
-engine3 = [
-%s(),
-%s(                    (  ) (@@)  ( )  (@)  ()     @@     O     @     o     @     o),
-%s(                 (@@@)),
-%s(              (    )),
-%s(           (@@@@)),
-%s(),
-%s(        (    )),
-%s(       =====        ________                ___________),
-%s(   _D _|   |_______/        \__I_I_____===__|_________|),
-%s(    | (_)---   |  H\________/ |   |        =|_______|       __________________),
-%s(   /        |  |  H  |  |     |   |         ||_| [_]|      _|                 \______A),
-%s(  |         |  |  H  |__--------------------| [___] |    =|                          |),
-%s(  | ___________|__H__/__|_____/[][]~\_______|       |    -|                          |),
-%s(  |/ |   |-------------I_____I [][] []  D   |=======|_____|__________________________|_),
-%s(__/ =| o | / \  / \  / \  / \___________Y___________|__|_____________________________|_),
-%s( |/-=|___|=   ||   ||   ||   |___________/~\___/            |_D__D__D_|  |_D__D__D_|),
-%s(  \_/     =\_/o=\_/o=\_/o=\_/==o\        \_/                 \_/   \_/    \_/   \_/)
-]
-mxsize=0
-0.upto(engine1.size-1) do |i|
-	l=engine1[i].size
-	if mxsize<l
-		mxsize = l
-	end
-end	
+require 'pry'
+Dir["./constants/*.rb"].each {|file| require file }
+Dir["./classes/*.rb"].each {|file| require file }
+
+train = Train.new
+max_size = train.max_train_length
+
 Curses.init_screen
-lines = Curses.lines-1
-cols = Curses.cols-1
 k = 0
 begin
-	Curses.clear
-	0.upto(cols+mxsize) do |i|
-		if k == 3
-     	   k = 0
-     	end
-     	k+=1
-		i.upto(cols+mxsize) do |g|
- 			0.upto(16) do |j|
- 				if cols > i    
- 					Curses.setpos(j+((lines/2)-8),cols-i)
- 					if k == 1
-	 					Curses.addstr(engine1[j][0..i].to_s)
- 					elsif k == 2
-						Curses.addstr(engine2[j][0..i].to_s)
-		    		else
-		    			Curses.addstr(engine3[j][0..i].to_s)
-		    		end
-		    	else
-		    		Curses.setpos(j+((lines/2)-8),0)
- 					if k == 1
-	 					Curses.addstr(engine1[j][i-cols..engine1[j].size].to_s)
- 					elsif k == 2
-						Curses.addstr(engine2[j][i-cols..engine2[j].size].to_s)
-		    		else
-		    			Curses.addstr(engine3[j][i-cols..engine3[j].size].to_s)
-		    		end
-		    	end
- 			end 
- 		end
-		if true
-			Curses.setpos(Curses.lines-1,0)
-			sleep 0.01
- 			Curses.refresh
-	#		Curses.getch
-		end
- 		Curses.clear
-	end
-ensure 
+  0.upto(COLUMNS_COUNT+max_size) do |position|
+    position.upto(COLUMNS_COUNT+max_size) do
+       0.upto(TRAIN_HEIGTH) do |part_of_train|
+        if train.showing_train?(position)
+           Curses.setpos( train.correct_position( part_of_train ), COLUMNS_COUNT - position )
+           Curses.addstr( train.correct_element_for_show( train, position, part_of_train ) )
+        else
+          Curses.setpos( train.correct_position( part_of_train ), 0 )
+          Curses.addstr( train.correct_element_for_hide( train, position, part_of_train ) )
+        end
+      end
+    end
+    Curses.setpos(LINES_COUNT,0)
+    sleep 0.01
+    Curses.refresh
+    Curses.clear
+  end
+ensure
     Curses.close_screen
 end
