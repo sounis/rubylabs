@@ -1,0 +1,15 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    colorize (0.7.7)
+    hpricot (0.8.6)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  colorize
+  hpricot
+
+BUNDLED WITH
+   1.10.6
